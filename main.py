@@ -1,6 +1,7 @@
 import cv2
 from pytesseract import pytesseract
 import re
+import getpass
 
 
 def findCheckIn(text):
@@ -11,18 +12,22 @@ def findCheckIn(text):
         code = re.findall(pattern, text)
         if not code == []:
             codes.append(code)
-
     return codes
 
 
 def checkIn(code):
-    pass
+    # NOTE: application should be run directly through python executable to avoid password echoing
+
+    # username = "40618869@live.napier.ac.uk"
+    # password = "no password :( "
+
+    print("Enter student number")
+    username = input() + "@live.napier.ac.uk"
+    print("Enter password")
+    password = getpass.getpass()
 
 
 def main():
-    username = "40618869@live.napier.ac.uk"
-    password = "no password :( "
-
     cv2.namedWindow("preview")
     vc = cv2.VideoCapture(0)
 
@@ -48,6 +53,7 @@ def main():
 
     cv2.destroyWindow("preview")
     vc.release()
+
 
 if __name__ == "__main__":
     main()
