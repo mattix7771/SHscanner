@@ -16,7 +16,7 @@ def findCheckIn(text):
 
 
 def checkIn(code):
-    # NOTE: application should be run directly through python executable to avoid password echoing
+    # NOTE: application should be run directly through exe to avoid password echoing (execution through pycharm leads to cras)
 
     # username = "40618869@live.napier.ac.uk"
     # password = "no password :( "
