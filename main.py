@@ -2,7 +2,13 @@ import cv2
 from pytesseract import pytesseract
 import re
 import getpass
+from tkinter import *
 
+#Window Tkinter->
+app = Tk()
+app.title("shScanner")
+app.geometry("800x600")
+#->end
 
 def findCheckIn(text):
     # patterns for XXX XXX and XXXXXX
@@ -28,6 +34,16 @@ def checkIn(code):
 
 
 def main():
+    #Button->
+    #Image
+    startScannImage = PhotoImage(file="C:/Users/Stepan/Documents/Programming/Python/hackathon - shScanner/SHscanner-master/Start Scan pic.png")
+    startScannImage_label = Label(image=startScannImage)
+
+    #Clickable body of the image
+    scannButton = Button(app, image=startScannImage, borderwidth=0,command=app.destroy).pack(padx=0,pady= 180) #
+
+    app.mainloop()
+#->end
     cv2.namedWindow("preview")
     vc = cv2.VideoCapture(0)
 
