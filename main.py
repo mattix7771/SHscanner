@@ -11,6 +11,7 @@ import re
 import os
 from tkinter import *
 
+
 def init(username, password, browser):
     browser.get("https://i.napier.ac.uk/campusm/home#menu")
 
@@ -36,7 +37,8 @@ def init(username, password, browser):
 
             WebDriverWait(browser, 1000).until_not(EC.presence_of_element_located((By.CLASS_NAME, "displaySign")))
 
-            WebDriverWait(browser, 1000).until(EC.presence_of_element_located((By.XPATH, "//input[@type='submit']"))).click()
+            WebDriverWait(browser, 1000).until(
+                EC.presence_of_element_located((By.XPATH, "//input[@type='submit']"))).click()
             time.sleep(2)
         except:
             return False
@@ -47,7 +49,7 @@ def init(username, password, browser):
 
     time.sleep(2)
 
-    #print(elem.get_attribute("interHTML"))
+    # print(elem.get_attribute("interHTML"))
     browser.switch_to.frame(1)
     # print(browser.page_source)
 
@@ -58,7 +60,7 @@ def init(username, password, browser):
     return True
 
 
-def findCheckIn(text):
+def find_checkin(text):
     # patterns for XXX XXX and XXXXXX
     patterns = ["[A-Z0-9]{3} [A-Z0-9]{3}", "[A-Z0-9]{6}"]
     codes = []
@@ -69,7 +71,8 @@ def findCheckIn(text):
 
     return codes
 
-def checkIn(code, browser):
+
+def check_in(code, browser):
     input = browser.find_element(By.XPATH, "//input[@type='text']")
     input.send_keys(code)
 
@@ -83,10 +86,8 @@ def checkIn(code, browser):
     return False
 
 
-
-
 def main():
-    username = "40618869@live.napier.ac.uk"
+    username = "40671548@live.napier.ac.uk"
     password = ""
 
     app = Tk()
@@ -109,8 +110,7 @@ def main():
         print("No check in available or failed to login")
         return
 
-
-
+    # optical recognition
     cv2.namedWindow("preview")
     vc = cv2.VideoCapture(0)
 
@@ -124,10 +124,10 @@ def main():
     while rval:
         cv2.imshow("preview", frame)
         text = pytesseract.image_to_string(frame)
-        codes = findCheckIn(text)
+        codes = find_checkin(text)
 
         if not codes == []:
-            if checkIn(codes):
+            if check_in(codes):
                 time.sleep(5)
                 break
         rval, frame = vc.read()
@@ -142,6 +142,7 @@ def main():
     vc.release()
     time.sleep(10)
     browser.close()
+
 
 if __name__ == "__main__":
     main()
