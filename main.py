@@ -11,7 +11,6 @@ import re
 import os
 from tkinter import *
 
-
 def init(username, password, browser):
     browser.get("https://i.napier.ac.uk/campusm/home#menu")
 
@@ -22,6 +21,7 @@ def init(username, password, browser):
             browser.add_cookie(cookie)
 
     time.sleep(3)
+    cookies = False
     # if not logged in
     if not browser.current_url.startswith("https://i.napier.ac.uk/"):
         try:
@@ -37,8 +37,8 @@ def init(username, password, browser):
 
             WebDriverWait(browser, 1000).until_not(EC.presence_of_element_located((By.CLASS_NAME, "displaySign")))
 
-            WebDriverWait(browser, 1000).until(
-                EC.presence_of_element_located((By.XPATH, "//input[@type='submit']"))).click()
+            WebDriverWait(browser, 1000).until(EC.presence_of_element_located((By.XPATH, "//input[@type='submit']"))).click()
+            cookies = True
             time.sleep(2)
         except:
             return False
@@ -48,8 +48,10 @@ def init(username, password, browser):
     browser.find_element(By.ID, "menu-option-31782").click()
 
     time.sleep(2)
+    if cookies:
+        pickle.dump(browser.get_cookies(), open("cookies.pkl", "wb"))
 
-    # print(elem.get_attribute("interHTML"))
+    #print(elem.get_attribute("interHTML"))
     browser.switch_to.frame(1)
     # print(browser.page_source)
 
@@ -60,7 +62,7 @@ def init(username, password, browser):
     return True
 
 
-def find_checkin(text):
+def findCheckIn(text):
     # patterns for XXX XXX and XXXXXX
     patterns = ["[A-Z0-9]{3} [A-Z0-9]{3}", "[A-Z0-9]{6}"]
     codes = []
@@ -71,8 +73,7 @@ def find_checkin(text):
 
     return codes
 
-
-def check_in(code, browser):
+def checkIn(code, browser):
     input = browser.find_element(By.XPATH, "//input[@type='text']")
     input.send_keys(code)
 
@@ -81,36 +82,42 @@ def check_in(code, browser):
         submit.click()
         return True
 
+    time.sleep(5)
     input.clear()
 
     return False
 
-
 def main():
-    username = "40671548@live.napier.ac.uk"
+    username = "40618869@live.napier.ac.uk"
     password = ""
-
+    # Window->
     app = Tk()
     app.title("shScanner")
     app.geometry("800x600")
+    #->end
 
+####################
+    #Image->
     startScannImage = PhotoImage(file="Start Scan pic.png")
     startScannImage_label = Label(image=startScannImage)
+    #->end
 
-    # Clickable body of the image
-    scannButton = Button(app, image=startScannImage, borderwidth=0, command=app.destroy).pack(padx=0, pady=180)  #
+    # Clickable body of the image->
+    scannButton = Button(app, image=startScannImage, borderwidth=0, command=app.destroy).pack(padx=0, pady=150)  #
+    #->
 
     app.mainloop()
 
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
     browser = webdriver.Chrome(options=chrome_options)
     if not init(username, password, browser):
         browser.close()
         print("No check in available or failed to login")
         return
 
-    # optical recognition
+
+
     cv2.namedWindow("preview")
     vc = cv2.VideoCapture(0)
 
@@ -124,25 +131,22 @@ def main():
     while rval:
         cv2.imshow("preview", frame)
         text = pytesseract.image_to_string(frame)
-        codes = find_checkin(text)
+        codes = findCheckIn(text)
 
         if not codes == []:
-            if check_in(codes):
-                time.sleep(5)
-                break
+            for code in codes:
+                if checkIn(code, browser):
+                    time.sleep(5)
+                    break
         rval, frame = vc.read()
 
         key = cv2.waitKey(20)
         if key == 27:
             break
 
-    if not os.path.exists("cookies.pkl"):
-        pickle.dump(browser.get_cookies(), open("cookies.pkl", "wb"))
     cv2.destroyWindow("preview")
     vc.release()
-    time.sleep(10)
     browser.close()
-
 
 if __name__ == "__main__":
     main()
